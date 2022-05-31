@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.*;
 import java.io.*;
+import java.util.stream.Collectors;
 
 /**
  * Класс выполнения команд, работы с коллекцией
@@ -164,24 +165,40 @@ public class CollectionManager {
     }
 
     public void execute(UpdateCmd c, long id, Organization updatedOrg, DatagramChannel channel, InetSocketAddress socketAddress){
-        boolean flag = false;
         String updateText = "";
-        LinkedHashSet<Organization> oldOrg = new LinkedHashSet<>(organizations);
-        for (Organization el: oldOrg){
-            if (el.getId() == id){
-                flag = true;
-                el.setName(updatedOrg.getName());
-                el.setCoordinates(updatedOrg.getCoordinates());
-                el.setAnnualTurnover(updatedOrg.getAnnualTurnover());
-                el.setEmployeesCount(updatedOrg.getEmployeesCount());
-                el.setType(updatedOrg.getType());
-                el.setPostalAddress(updatedOrg.getPostalAddress());
-            }
-        }
-        if (flag){
-            updateText = "Организация успешно обновлена.";
-        }else{
+//        boolean flag = false;
+//        LinkedHashSet<Organization> oldOrg = new LinkedHashSet<>(organizations);
+//        for (Organization el: oldOrg){
+//            if (el.getId() == id){
+//                flag = true;
+//                el.setName(updatedOrg.getName());
+//                el.setCoordinates(updatedOrg.getCoordinates());
+//                el.setAnnualTurnover(updatedOrg.getAnnualTurnover());
+//                el.setEmployeesCount(updatedOrg.getEmployeesCount());
+//                el.setType(updatedOrg.getType());
+//                el.setPostalAddress(updatedOrg.getPostalAddress());
+//            }
+//        }
+//        if (flag){
+//            updateText = "Организация успешно обновлена.";
+//        }else{
+//            updateText = "Не существует организации с id " + id;
+//        }
+        if (organizations.stream().filter(org -> org.getId() == id).collect(Collectors.toList()).size() == 0){
             updateText = "Не существует организации с id " + id;
+        } else{
+            organizations.stream().filter(el -> {
+                if (el.getId() == id){
+                    el.setName(updatedOrg.getName());
+                    el.setCoordinates(updatedOrg.getCoordinates());
+                    el.setAnnualTurnover(updatedOrg.getAnnualTurnover());
+                    el.setEmployeesCount(updatedOrg.getEmployeesCount());
+                    el.setType(updatedOrg.getType());
+                    el.setPostalAddress(updatedOrg.getPostalAddress());
+                }
+                return true;
+            }).collect(Collectors.toList());
+            updateText = "Организация успешно обновлена.";
         }
         ServerMessage serverMessage = new ServerMessage(updateText);
         ServerSender serverSender = new ServerSender(serverMessage);

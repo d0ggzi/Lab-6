@@ -1,0 +1,6 @@
+help
+show
+info
+execute_script C:\Users\maks-\GoogleDrive\programming\java\lab6_all\lab6\Client\src\main\resources\script2.txt
+
+
